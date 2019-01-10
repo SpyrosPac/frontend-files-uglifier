@@ -92,7 +92,6 @@ public class UglifyMojo extends AbstractMojo {
 
     private int uglify(File[] jsFiles) throws IOException {
         int count = 0;
-        OutputStreamWriter out = null;
 
         for (File jsFile : jsFiles) {
             File outputFile = getOutputFile(jsFile);
@@ -101,27 +100,24 @@ public class UglifyMojo extends AbstractMojo {
 
             if (!skipFile) {
                 final String jsFilePath = jsFile.getPath();
-                getLog().info("Uglifying " + jsFilePath);
-                try {
-                    String output =
-                            new UglifyJavaScriptContext(getLog(), "uglifyjs.js", "uglifyJavascript.js")
-                                    .invokeFunctionOnFile(jsFile, mangle);
+                final String encoding = "UTF-8";
 
-                    String encoding = "UTF-8";
-                    out = new OutputStreamWriter(new FileOutputStream(outputFile, false), encoding);
+                getLog().debug("Uglifying " + jsFilePath);
+                String output =
+                        new UglifyJavaScriptContext(getLog(), "uglifyjs.js", "uglifyJavascript.js")
+                                .invokeFunctionOnFile(jsFile, mangle);
+
+                try (OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(outputFile, false), encoding)) {
                     out.write(output);
                 } catch (IOException e) {
                     getLog().error("Could not uglify " + jsFile.getPath() + ".", e);
                     throw e;
                 } finally {
                     Context.exit();
-                    if (out != null) {
-                        out.close();
-                    }
                 }
                 count++;
             } else {
-                getLog().info("skipping file " + jsFile.getName());
+                getLog().debug("skipping file " + jsFile.getName());
             }
 
         }

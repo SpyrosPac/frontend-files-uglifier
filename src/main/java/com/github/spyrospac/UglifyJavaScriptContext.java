@@ -37,21 +37,11 @@ class UglifyJavaScriptContext {
     UglifyJavaScriptContext(final Log log, final String... scripts) {
         ClassLoader cl = getClass().getClassLoader();
         for (String script : scripts) {
-            InputStreamReader in = null;
 
-            try {
-                in = new InputStreamReader(cl.getResourceAsStream("script/" + script), "UTF-8");
+            try (InputStreamReader in = new InputStreamReader(cl.getResourceAsStream("script/" + script), "UTF-8")) {
                 cx.evaluateReader(global, in, script, 1, null);
             } catch (IOException e) {
-                log.error(e.getMessage());
-            } finally {
-                try {
-                    if (in != null) {
-                        in.close();
-                    }
-                } catch (IOException e) {
-                    log.error(e.getMessage());
-                }
+                log.error(e.getMessage(), e);
             }
 
         }
