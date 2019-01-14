@@ -1,8 +1,6 @@
 # frontend-files-uglifier
 
 Welcome! **frontend-files-uglifier** is a maven plugin to uglify (minify) front end files for Java Web Applications. Currently only JavaScript files can be minified.
-*Note: the plugin is not yet uploaded to maven central, but you can install it locally.*
-
 
 # Introduction
 
@@ -26,7 +24,7 @@ You can call the plugin during the build process:
     <plugin>  
 	    <groupId>com.github.spyrospac</groupId>  
 	    <artifactId>frontend-files-uglifier</artifactId>  
-	    <version>1.0-SNAPSHOT</version>  
+	    <version>1.0</version>  
 	  
 	    <executions>  
 	        <execution>  

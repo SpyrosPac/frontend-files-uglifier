@@ -7,6 +7,16 @@
     <name>frontend-files-uglifier Maven Mojo</name>
     <url>https://github.com/SpyrosPac/frontend-files-uglifier</url>
 
+    <description>
+        Maven plugin to minify frontend files.
+    </description>
+
+    <developers>
+        <developer>
+            <name>Spyros Pachomis</name>
+        </developer>
+    </developers>
+
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -16,9 +26,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:git://github.com/spyrospac/frontend-files-uglifier.git</connection>
-        <developerConnection>scm:git:git@github.com:spyrospac/frontend-files-uglifier.git</developerConnection>
-        <url>https://github.com/dexecutor/frontend-files-uglifier</url>
+        <connection>scm:git:git://github.com/SpyrosPac/frontend-files-uglifier.git</connection>
+        <developerConnection>scm:git:git@github.com:SpyrosPac/frontend-files-uglifier.git</developerConnection>
+        <url>https://github.com/SpyrosPac/frontend-files-uglifier</url>
         <tag>HEAD</tag>
     </scm>
 
