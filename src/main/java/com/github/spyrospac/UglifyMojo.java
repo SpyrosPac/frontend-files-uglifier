@@ -133,7 +133,8 @@ public class UglifyMojo extends AbstractMojo {
      * @throws IOException
      */
     private File getOutputFile(File inputFile) throws IOException {
-        String fileName = keepName ? inputFile.getName() : inputFile.getName().replace(".js", ".min.js");
+        // replace ending
+        String fileName = keepName ? inputFile.getName() : inputFile.getName().replaceAll(".js$", ".min.js");
 
         if (outputDirectory == null) {
             // create the minified file in the same folder

@@ -33,6 +33,8 @@ public class UglifyMojoTest extends AbstractMojoTestCase {
 
         deleteFileIfExists(MINIFIED_FILE_LOCATION9);
 
+        deleteFileIfExists(MINIFIED_FILE_LOCATION10);
+
         super.tearDown();
 
     }
@@ -273,6 +275,35 @@ public class UglifyMojoTest extends AbstractMojoTestCase {
 
         // minification was successful
         String minifiedString = FileUtils.readFileToString(minifiedFile2, Charset.defaultCharset());
+        assertEquals("uglifyJavascript=function(i){return UglifyJS.minify(i).code};", minifiedString);
+    }
+
+    /**
+     * tests that if a file contains '.js' in its filename it is not replaced
+     *
+     * @throws Exception
+     */
+    public void testDoNotSkipIfFilenameContainsDotJs() throws Exception {
+
+        File testPom = new File(getBasedir(), TEST_POM_LOCATION7);
+
+        UglifyMojo mojo = new UglifyMojo();
+        mojo = (UglifyMojo) configureMojo(
+                mojo, extractPluginConfiguration("uglifyjs3-maven-plugin", testPom
+                ));
+
+        assertNotNull(mojo);
+
+        mojo.getLog().info("-- Do Not Skip If Filename Contains Dot Js");
+
+        mojo.execute();
+
+        File minifiedFile = new File(getBasedir(), MINIFIED_FILE_LOCATION10);
+
+        assertTrue(minifiedFile.exists());
+
+        String minifiedString = FileUtils.readFileToString(minifiedFile, Charset.defaultCharset());
+
         assertEquals("uglifyJavascript=function(i){return UglifyJS.minify(i).code};", minifiedString);
     }
 

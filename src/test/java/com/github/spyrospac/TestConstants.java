@@ -17,6 +17,8 @@ class TestConstants {
             "src/test/resources/unit/basic-test/test-plugin-config-skip-if-not-updated.xml";
     static final String TEST_POM_LOCATION6 =
             "src/test/resources/unit/basic-test/test-plugin-config-do-not-skip-if-updated.xml";
+    static final String TEST_POM_LOCATION7 =
+            "src/test/resources/unit/basic-test/test-plugin-config-do-not-skip-if-filename-contains-js.xml";
 
     // minified files locations
     static final String MINIFIED_FILE_LOCATION =
@@ -37,4 +39,7 @@ class TestConstants {
             "src/test/resources/unit/basic-test/script/testDoNotSkipMinify.js";
     static final String MINIFIED_FILE_LOCATION9 =
             "src/test/resources/unit/basic-test/script/testDoNotSkipMinify.min.js";
+    static final String MINIFIED_FILE_LOCATION10 =
+            "src/test/resources/unit/basic-test/script/test.jscript.min.js";
+
 }
