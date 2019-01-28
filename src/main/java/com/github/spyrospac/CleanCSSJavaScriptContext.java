@@ -17,24 +17,26 @@ package com.github.spyrospac;
  *
  */
 
+import org.apache.commons.io.FileUtils;
+import org.apache.maven.plugin.logging.Log;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ScriptableObject;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.maven.plugin.logging.Log;
-
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ScriptableObject;
-
 /**
  * Class used to invoke uglify javascript file.
  */
-class UglifyJavaScriptContext {
+class CleanCSSJavaScriptContext {
     private final Context cx = Context.enter();
-    private final ScriptableObject global = cx.initStandardObjects();
 
-    UglifyJavaScriptContext(final Log log, final String... scripts) {
+    private ScriptableObject global;
+
+    CleanCSSJavaScriptContext(final Log log, final String... scripts) {
+//        cx.setLanguageVersion(Context.VERSION_ES6);
+        global = cx.initStandardObjects();
         ClassLoader cl = getClass().getClassLoader();
         for (String script : scripts) {
 
@@ -48,18 +50,16 @@ class UglifyJavaScriptContext {
     }
 
     /**
-     * Invokes the uglifyJavascript() function with parameters the code and the mangle option.
+     * Invokes the minifyCss() function with code.
      *
      * @param file
-     * @param mangle
      * @return minified file as a String
      * @throws IOException
      */
-    String invokeUglifyJSFunctionOnFile(final File file, final boolean mangle) throws IOException {
+    String invokeCleanCssFunctionOnFile(final File file) throws IOException {
         String data = FileUtils.readFileToString(file, "UTF-8");
         ScriptableObject.putProperty(global, "data", data);
-        ScriptableObject.putProperty(global, "mangle", String.valueOf(mangle));
         return cx.evaluateString(global,
-                "uglifyJavascript" + "(String(data), String(mangle));", "<cmd>", 1, null).toString();
+                "minifyCSS" + "(String(data));", "<cmd>", 1, null).toString();
     }
 }

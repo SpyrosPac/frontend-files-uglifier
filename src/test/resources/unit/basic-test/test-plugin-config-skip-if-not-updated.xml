@@ -5,13 +5,13 @@
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
 
-    <name>Apache Maven UglifyJS plugin unit test 1</name>
+    <name>Apache Maven frontend-files-uglifier plugin unit test 1</name>
     <description>Configuration to minify file in the same folder</description>
     <build>
         <plugins>
             <plugin>
-                <groupId>com.spyros</groupId>
-                <artifactId>uglifyjs3-maven-plugin</artifactId>
+                <groupId>com.github.spyrospac</groupId>
+                <artifactId>frontend-files-uglifier</artifactId>
                 <configuration>
                     <sources>
                         <directory>src/test/resources/unit/basic-test/script</directory>

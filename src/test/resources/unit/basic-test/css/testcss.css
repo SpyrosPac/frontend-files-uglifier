@@ -1,0 +1,39 @@
+/* 
+    This file contains the application-specific colour scheme.
+*/
+/* import the common styles for testnav */
+@import url(../../common/testnav/stylesheet/testnav.css);
+
+/* override colour scheme with "orange" */
+
+
+/* COLOUR SCHEME STARTS HERE  */
+div#testNav{
+    background-color:#FFFFFF;
+    border-bottom:1px solid #EBAD14;
+}
+div#testNav ul ul{
+    background:#F4D88F url(../images/testnav/testnav_dropdown_bgd.jpg) left top repeat-x;
+    border-left:1px solid #EBAD14;
+    border-right:1px solid #EBAD14;
+    border-bottom:1px solid #EBAD14;
+}
+div#testNav ul.sf-menu a, .sf-menu a:visited  { /* visited pseudo selector so IE6 applies text colour*/
+    color:#000000
+}
+div#testNav ul.sf-menu li {
+    background:transparent url(../images/testnav/testnav_divider_bgd.jpg) left center no-repeat
+}
+div#testNav ul.sf-menu li li li {
+    background:#EBAD14
+}
+div#testNav ul.sf-menu li:hover, 
+div#testNav ul.sf-menu li.sfHover,
+div#testNav ul.sf-menu a:focus, 
+div#testNav ul.sf-menu a:hover, 
+div#testNav ul.sf-menu a:active {
+    outline:0;
+    background-color:transparent;
+    color:#EBAD14
+}
+/* end colour scheme */

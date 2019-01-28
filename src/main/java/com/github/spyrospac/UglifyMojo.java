@@ -34,7 +34,6 @@ import java.io.OutputStreamWriter;
 
 /**
  * Goal which uglifies JavaScript files with UglifyJS (version 3.4.9).
- * TODO uglify css too
  *
  * @goal uglify_plugin
  * @phase compile
@@ -42,26 +41,31 @@ import java.io.OutputStreamWriter;
 @Mojo(name = "uglify", defaultPhase = LifecyclePhase.COMPILE)
 public class UglifyMojo extends AbstractMojo {
 
+    private static boolean minifyJSEnabled;
+    private static boolean minifyCSSEnabled;
+
+    UglifyMojo() {
+        setMinifyCSSEnabled(false);
+        setMinifyJSEnabled(false);
+    }
+
     /**
      * {@link org.apache.maven.shared.model.fileset.FileSet} containing JavaScript source files.
      */
     @Parameter
     private FileSet sources;
-
     /**
      * {@link java.io.File} indicating where the minified files should be created.
      * If no output directory is defined, the minified file will be created on the same folder.
      */
     @Parameter
     private File outputDirectory;
-
     /**
      * Parameter for mangle (e.g. keep the function parameter names)
      * Default value is true.
      */
     @Parameter
     private boolean mangle = true;
-
     /**
      * Parameter to minify into a new file with the same name, if set to true.
      * If no output directory is defined, then the existing file will be replaced.
@@ -69,13 +73,18 @@ public class UglifyMojo extends AbstractMojo {
      */
     @Parameter
     private boolean keepName = false;
-
     /**
      * Parameter to minify only js files that are modified after their respective js files.
      * Default value is false.
      */
     @Parameter
     private boolean minifyOnlyUpdated = false;
+    /**
+     * Parameter to identify files to minify.
+     * Default value is javascript and css.
+     */
+    @Parameter
+    private String typesToMinify = "js,css";
 
     public void execute() throws MojoExecutionException {
 
@@ -90,39 +99,57 @@ public class UglifyMojo extends AbstractMojo {
         }
     }
 
-    private int uglify(File[] jsFiles) throws IOException {
+    private int uglify(File[] files) throws IOException {
         int count = 0;
 
-        for (File jsFile : jsFiles) {
-            File outputFile = getOutputFile(jsFile);
+        checkTypesToMinify();
 
-            boolean skipFile = shouldFileBeSkipped(outputFile, jsFile);
+        for (File file : files) {
+            File outputFile = getOutputFile(file);
+
+            boolean skipFile = shouldFileBeSkipped(outputFile, file);
 
             if (!skipFile) {
-                final String jsFilePath = jsFile.getPath();
-                final String encoding = "UTF-8";
+                final String filePath = file.getPath();
 
-                getLog().debug("Uglifying " + jsFilePath);
-                String output =
-                        new UglifyJavaScriptContext(getLog(), "uglifyjs.js", "uglifyJavascript.js")
-                                .invokeFunctionOnFile(jsFile, mangle);
+                if (isMinifyJSEnabled() && isFileJavaScript(file)) {
+                    getLog().debug("Uglifying " + filePath);
+                    String output =
+                            new UglifyJavaScriptContext(getLog(), "uglifyjs.js", "uglifyJavascript.js")
+                                    .invokeUglifyJSFunctionOnFile(file, mangle);
 
-                try (OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(outputFile, false), encoding)) {
-                    out.write(output);
-                } catch (IOException e) {
-                    getLog().error("Could not uglify " + jsFile.getPath() + ".", e);
-                    throw e;
-                } finally {
-                    Context.exit();
+                    writeToFile(output, file, outputFile);
+                    count++;
+                } else if (isMinifyCSSEnabled() && isFileCSS(file)) {
+                    getLog().debug("Uglifying " + filePath);
+                    String output =
+                            new CleanCSSJavaScriptContext(getLog(), "clean-css-v4.2.1.js", "minifyCSS.js")
+                                    .invokeCleanCssFunctionOnFile(file);
+
+                    writeToFile(output, file, outputFile);
+                    count++;
                 }
-                count++;
+
             } else {
-                getLog().debug("skipping file " + jsFile.getName());
+                getLog().debug("skipping file " + file.getName());
             }
 
         }
 
         return count;
+    }
+
+    private void writeToFile(String output, File file, File outputFile) throws IOException{
+        final String encoding = "UTF-8";
+
+        try (OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(outputFile, false), encoding)) {
+            out.write(output);
+        } catch (IOException e) {
+            getLog().error("Could not uglify " + file.getPath() + ".", e);
+            throw e;
+        } finally {
+            Context.exit();
+        }
     }
 
     /**
@@ -134,7 +161,7 @@ public class UglifyMojo extends AbstractMojo {
      */
     private File getOutputFile(File inputFile) throws IOException {
         // replace ending
-        String fileName = keepName ? inputFile.getName() : inputFile.getName().replaceAll(".js$", ".min.js");
+        String fileName = keepName ? inputFile.getName() : inputFile.getName().replaceAll(".js$", ".min.js").replaceAll(".css$", ".min.css");
 
         if (outputDirectory == null) {
             // create the minified file in the same folder
@@ -152,9 +179,9 @@ public class UglifyMojo extends AbstractMojo {
     }
 
     /**
-     * Returns {@link File directory} containing JavaScript source {@link File files}.
+     * Returns {@link File directory} containing JavaScript/CSS source {@link File files}.
      *
-     * @return {@link File Directory} containing JavaScript source {@link File files}
+     * @return {@link File Directory} containing JavaScript/CSS source {@link File files}
      */
     private File getSourceDir() {
         return new File(sources.getDirectory());
@@ -163,7 +190,7 @@ public class UglifyMojo extends AbstractMojo {
     /**
      * Returns JavaScript sources {@link File files}.
      *
-     * @return Array of JavaScript sources {@link File files}
+     * @return Array of JavaScript/CSS sources {@link File files}
      */
     private File[] getSourceFiles() {
         getLog().info(sources.getDirectory());
@@ -179,19 +206,53 @@ public class UglifyMojo extends AbstractMojo {
     }
 
     /**
-     * Checks if the file should not be minified
+     * Checks if the file should not be minified (only js and css files are allowed).
      * If keepName is true and outputDirectory is null, don't skip, just replace.
      * If "minifyOnlyUpdated" parameter is set to true, then checks if the file is older than an existing min.js file
      * (which would mean that the original file is updated)
      *
      * @param outputFile
-     * @param jsFile
+     * @param inputFile
      * @return true if the file should be skipped
-     *
      */
-    private boolean shouldFileBeSkipped(File outputFile, File jsFile) {
-        return !jsFile.getName().endsWith(".js")
-                || (outputFile.exists() && !outputFile.getAbsolutePath().equals(jsFile.getAbsolutePath())
-                && (minifyOnlyUpdated && outputFile.lastModified() >= jsFile.lastModified()));
+    private boolean shouldFileBeSkipped(File outputFile, File inputFile) {
+        return (!isFileJavaScript(inputFile) && !isFileCSS(inputFile))
+                || (outputFile.exists() && !outputFile.getAbsolutePath().equals(inputFile.getAbsolutePath())
+                && (minifyOnlyUpdated && outputFile.lastModified() >= inputFile.lastModified()));
+    }
+
+    private void checkTypesToMinify() {
+        String[] values = typesToMinify.split(",");
+        for (String value : values) {
+            if ("js".equals(value)) {
+                setMinifyJSEnabled(true);
+            } else if ("css".equals(value)) {
+                setMinifyCSSEnabled(true);
+            }
+        }
+    }
+
+    private boolean isFileJavaScript(File file) {
+        return file.getName().endsWith(".js");
+    }
+
+    private boolean isFileCSS(File file) {
+        return file.getName().endsWith(".css");
+    }
+
+    private boolean isMinifyJSEnabled() {
+        return minifyJSEnabled;
+    }
+
+    private void setMinifyJSEnabled(boolean minifyJSEnabled) {
+        UglifyMojo.minifyJSEnabled = minifyJSEnabled;
+    }
+
+    private boolean isMinifyCSSEnabled() {
+        return minifyCSSEnabled;
+    }
+
+    private void setMinifyCSSEnabled(boolean minifyCSSEnabled) {
+        UglifyMojo.minifyCSSEnabled = minifyCSSEnabled;
     }
 }

@@ -3,9 +3,9 @@
     <groupId>test.unit</groupId>
     <artifactId>maven-migrate-plugin</artifactId>
     <packaging>jar</packaging>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
 
-    <name>Apache Maven frontend-files-uglifier plugin unit test 1</name>
+    <name>Apache Maven frontend-file-uglifier plugin unit test 1</name>
     <description>Configuration to minify file in the same folder</description>
     <build>
         <plugins>
@@ -14,15 +14,15 @@
                 <artifactId>frontend-files-uglifier</artifactId>
                 <configuration>
                     <sources>
-                        <directory>src/test/resources/unit/basic-test/script</directory>
+                        <directory>src/test/resources/unit/basic-test/css</directory>
                         <excludes>
                             <exclude>org/foo</exclude>
                             <exclude>org/bar</exclude>
                             <exclude>**/*.min.js</exclude>
+                            <exclude>**/*.min.css</exclude>
                         </excludes>
-                        <includes>uglifyJavascriptTest.js</includes>
                     </sources>
-                    <typesToMinify>js</typesToMinify>
+                    <typesToMinify>css</typesToMinify>
                 </configuration>
             </plugin>
         </plugins>

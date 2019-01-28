@@ -35,6 +35,8 @@ public class UglifyMojoTest extends AbstractMojoTestCase {
 
         deleteFileIfExists(MINIFIED_FILE_LOCATION10);
 
+        deleteFileIfExists(MINIFIED_FILE_LOCATION11);
+
         super.tearDown();
 
     }
@@ -50,7 +52,7 @@ public class UglifyMojoTest extends AbstractMojoTestCase {
 
         UglifyMojo mojo = new UglifyMojo();
         mojo = (UglifyMojo) configureMojo(
-                mojo, extractPluginConfiguration("uglifyjs3-maven-plugin", testPom
+                mojo, extractPluginConfiguration(ARTIFACT_ID, testPom
                 ));
 
         assertNotNull(mojo);
@@ -66,6 +68,41 @@ public class UglifyMojoTest extends AbstractMojoTestCase {
         String minifiedString = FileUtils.readFileToString(minifiedFile, Charset.defaultCharset());
 
         assertEquals("uglifyJavascript=function(i){return UglifyJS.minify(i).code};", minifiedString);
+    }
+
+    /**
+     * tests basic minification of CSS file
+     *
+     * @throws Exception
+     */
+    public void testBasicCSSMinify() throws Exception {
+        String expected
+                = "@import url(../../common/testnav/stylesheet/testnav.css);div#testNav,div#testNav ul ul{border-bottom:1px solid #ebad14}div#testNav{background-color:#fff}div#testNav ul ul{background:#f4d88f url(../images/testnav/testnav_dropdown_bgd.jpg) left top repeat-x;border-left:1px solid #ebad14;border-right:1px solid #ebad14}.sf-menu a:visited,div#testNav ul.sf-menu a{color:#000}div#testNav ul.sf-menu li{background:url(../images/testnav/testnav_divider_bgd.jpg) left center no-repeat}div#testNav ul.sf-menu li li li{background:#ebad14}div#testNav ul.sf-menu a:active,div#testNav ul.sf-menu a:focus,div#testNav ul.sf-menu a:hover,div#testNav ul.sf-menu li.sfHover,div#testNav ul.sf-menu li:hover{outline:0;background-color:transparent;color:#ebad14}";
+
+        File testPom = new File(getBasedir(), TEST_POM_LOCATION8);
+
+        UglifyMojo mojo = new UglifyMojo();
+        mojo = (UglifyMojo) configureMojo(
+                mojo, extractPluginConfiguration(ARTIFACT_ID, testPom
+                ));
+
+        assertNotNull(mojo);
+
+        mojo.getLog().info("-- Test Basic CSS Minify");
+
+        mojo.execute();
+
+        File minifiedFile = new File(getBasedir(), MINIFIED_FILE_LOCATION11);
+
+        assertTrue(minifiedFile.exists());
+
+        String minifiedString = FileUtils.readFileToString(minifiedFile, Charset.defaultCharset());
+
+        assertEquals(expected, minifiedString);
+
+        minifiedFile = new File(getBasedir(), MINIFIED_FILE_LOCATION12);
+
+        assertFalse(minifiedFile.exists());
     }
 
     /**
@@ -91,7 +128,7 @@ public class UglifyMojoTest extends AbstractMojoTestCase {
 
         UglifyMojo mojo = new UglifyMojo();
         mojo = (UglifyMojo) configureMojo(
-                mojo, extractPluginConfiguration("uglifyjs3-maven-plugin", testPom
+                mojo, extractPluginConfiguration(ARTIFACT_ID, testPom
                 ));
 
         assertNotNull(mojo);
@@ -124,7 +161,7 @@ public class UglifyMojoTest extends AbstractMojoTestCase {
 
         UglifyMojo mojo = new UglifyMojo();
         mojo = (UglifyMojo) configureMojo(
-                mojo, extractPluginConfiguration("uglifyjs3-maven-plugin", testPom
+                mojo, extractPluginConfiguration(ARTIFACT_ID, testPom
                 ));
 
         assertNotNull(mojo);
@@ -154,7 +191,7 @@ public class UglifyMojoTest extends AbstractMojoTestCase {
 
         UglifyMojo mojo = new UglifyMojo();
         mojo = (UglifyMojo) configureMojo(
-                mojo, extractPluginConfiguration("uglifyjs3-maven-plugin", testPom
+                mojo, extractPluginConfiguration(ARTIFACT_ID, testPom
                 ));
         mojo.getLog().info("-- Test Minify To Specified Directory");
 
@@ -196,7 +233,7 @@ public class UglifyMojoTest extends AbstractMojoTestCase {
 
         UglifyMojo mojo = new UglifyMojo();
         mojo = (UglifyMojo) configureMojo(
-                mojo, extractPluginConfiguration("uglifyjs3-maven-plugin", testPom
+                mojo, extractPluginConfiguration(ARTIFACT_ID, testPom
                 ));
 
         assertNotNull(mojo);
@@ -257,7 +294,7 @@ public class UglifyMojoTest extends AbstractMojoTestCase {
 
         UglifyMojo mojo = new UglifyMojo();
         mojo = (UglifyMojo) configureMojo(
-                mojo, extractPluginConfiguration("uglifyjs3-maven-plugin", testPom
+                mojo, extractPluginConfiguration(ARTIFACT_ID, testPom
                 ));
 
         assertNotNull(mojo);
@@ -289,7 +326,7 @@ public class UglifyMojoTest extends AbstractMojoTestCase {
 
         UglifyMojo mojo = new UglifyMojo();
         mojo = (UglifyMojo) configureMojo(
-                mojo, extractPluginConfiguration("uglifyjs3-maven-plugin", testPom
+                mojo, extractPluginConfiguration(ARTIFACT_ID, testPom
                 ));
 
         assertNotNull(mojo);
