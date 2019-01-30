@@ -35,7 +35,7 @@ class CleanCSSJavaScriptContext {
     private ScriptableObject global;
 
     CleanCSSJavaScriptContext(final Log log, final String... scripts) {
-//        cx.setLanguageVersion(Context.VERSION_ES6);
+        cx.setLanguageVersion(Context.VERSION_ES6);
         global = cx.initStandardObjects();
         ClassLoader cl = getClass().getClassLoader();
         for (String script : scripts) {
